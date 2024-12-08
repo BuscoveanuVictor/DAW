@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formular de Contact</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Contactează-ne</h1>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="error-messages">
+                {% for error in form.non_field_errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="{{ form.nume.id_for_label }}">{{ form.nume.label }}</label>
+                {{ form.nume }}
+                {% if form.nume.errors %}
+                    {% for error in form.nume.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.prenume.id_for_label }}">{{ form.prenume.label }}</label>
+                {{ form.prenume }}
+                {% if form.prenume.errors %}
+                    {% for error in form.prenume.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.data_nasterii.id_for_label }}">{{ form.data_nasterii.label }}</label>
+                {{ form.data_nasterii }}
+                {% if form.data_nasterii.errors %}
+                    {% for error in form.data_nasterii.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    {% for error in form.email.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.confirm_email.id_for_label }}">{{ form.confirm_email.label }}</label>
+                {{ form.confirm_email }}
+                {% if form.confirm_email.errors %}
+                    {% for error in form.confirm_email.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.tip_mesaj.id_for_label }}">{{ form.tip_mesaj.label }}</label>
+                {{ form.tip_mesaj }}
+                {% if form.tip_mesaj.errors %}
+                    {% for error in form.tip_mesaj.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+                {{ form.subject }}
+                {% if form.subject.errors %}
+                    {% for error in form.subject.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.minim_zile_asteptare.id_for_label }}">{{ form.minim_zile_asteptare.label }}</label>
+                {{ form.minim_zile_asteptare }}
+                {% if form.minim_zile_asteptare.errors %}
+                    {% for error in form.minim_zile_asteptare.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.mesaj.id_for_label }}">{{ form.mesaj.label }}</label>
+                {{ form.mesaj }}
+                {% if form.mesaj.errors %}
+                    {% for error in form.mesaj.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <button type="submit" class="submit-button">Trimite mesajul</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,69 +1,118 @@
 from django.db import models
+from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator, RegexValidator
+from datetime import date
 
-class Furnizor(models.Model):
-    nume = models.CharField(max_length=100)
-    tara = models.CharField(max_length=100, blank=True, null=True)
-    contact = models.CharField(max_length=50, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
+
+class Instrument(models.Model):
+    instrument_id = models.AutoField(primary_key=True)
+    model = models.CharField(max_length=100, null=False)
+    description = models.TextField(blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=False)
+    rating = models.FloatField(blank=True, null=True)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='instruments', null=True)
+
+class Category(models.Model):
+    category_id = models.AutoField(primary_key=True)
+    instrument = models.CharField(max_length=50, null=False) # poate fi chitara, bas, tobe, etc.
+    type = models.TextField(blank=True, null=True) # poate fi acustica, electrica, etc.
+
+class Stock(models.Model):
+    stock_id = models.AutoField(primary_key=True)
+    instrument = models.OneToOneField(Instrument, on_delete=models.CASCADE, related_name='stock')
+    quantity = models.PositiveIntegerField(null=False, default=0)
+    warehouse_location = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
-        return self.nume
+        return f"Intrumentul {self.instrument.name} are {self.quantity} bucati in stoc in {self.warehouse_location} "
 
-
-class Tara(models.Model):
-    nume_tara = models.CharField(max_length=100)
-    cod_iso = models.CharField(max_length=3)
+class Supplier(models.Model):
+    supplier_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, null=False)
+    contact = models.CharField(max_length=50, blank=True, null=True)  
+    address = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.nume_tara
+        return f"Furnizorul {self.name} are contactul {self.contact} si adresa {self.address} "
 
-
-class Contract(models.Model):
-    TIP_CHOICES = [
-        ('Cumpărare', 'Cumpărare'),
-        ('Vânzare', 'Vânzare')
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('PROCESSING', 'Processing'),
+        ('SHIPPED', 'Shipped'),
+        ('DELIVERED', 'Delivered'),
+        ('CANCELLED', 'Cancelled'),
     ]
-    tip = models.CharField(max_length=20, choices=TIP_CHOICES)
-    furnizor = models.ForeignKey(Furnizor, on_delete=models.SET_NULL, null=True, blank=True)
-    tara = models.ForeignKey(Tara, on_delete=models.SET_NULL, null=True, blank=True)
-    volum_mwh = models.DecimalField(max_digits=10, decimal_places=2)
-    pret_mwh = models.DecimalField(max_digits=10, decimal_places=2)
-    data_inceput = models.DateField(blank=True, null=True)
-    data_sfarsit = models.DateField(blank=True, null=True)
+
+    order_id = models.AutoField(primary_key=True)
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='orders')
+    instrument = models.ManyToManyField(Instrument,related_name='orders')
+    order_date = models.DateField(auto_now_add=True)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='PROCESSING')
 
     def __str__(self):
-        return f"{self.tip} - {self.volum_mwh} MWh"
+        return f"Comanda de la furnizorul {self.supplier} pentru instrumentul {self.instrument} care are {self.quantity} bucati si este in starea de {self.status} "
 
 
-class Retea(models.Model):
-    TIP_CHOICES = [
-        ('Stație Transformare', 'Stație Transformare'),
-        ('Linie Înaltă Tensiune', 'Linie Înaltă Tensiune')
-    ]
-    tip = models.CharField(max_length=50, choices=TIP_CHOICES)
-    locatie = models.CharField(max_length=100)
-    capacitate_mwh = models.DecimalField(max_digits=10, decimal_places=2)
-    stare = models.CharField(max_length=20, choices=[('Operațional', 'Operațional'), ('Neoperațional', 'Neoperațional')])
+class OrderItem(models.Model):
+    order_item_id = models.AutoField(primary_key=True)
+    instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE, related_name='order_items')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
+    quantity = models.PositiveIntegerField(null=False)
 
     def __str__(self):
-        return f"{self.tip} - {self.locatie}"
+        return f"S-au comandat {self.quantity} bucati din instrumentul {self.instrument} care apartine comenzii {self.order} "
+    
 
-
-class FluxEnergie(models.Model):
-    contract = models.ForeignKey(Contract, on_delete=models.CASCADE)
-    retea = models.ForeignKey(Retea, on_delete=models.CASCADE)
-    data = models.DateField()
-    volum_mwh = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f"{self.contract} - {self.retea} - {self.data}"
-
-
-class PiataEnergie(models.Model):
-    nume = models.CharField(max_length=100)
-    pret_mwh = models.DecimalField(max_digits=10, decimal_places=2)
-    data = models.DateField()
+class ProductImage(models.Model):
+    image_id = models.AutoField(primary_key=True)
+    instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE, related_name='images')
+    image_url = models.URLField(null=False)
+    alter_img = models.URLField(null=False)
 
     def __str__(self):
-        return f"{self.nume} - {self.pret_mwh} RON/MWh"
+        return f"Imagine pentru instrumentul {self.instrument.name}"
 
+
+class Discount(models.Model):
+    discount_id = models.AutoField(primary_key=True)
+    instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE, related_name='discounts')
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=False)
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField(null=False)
+
+    def __str__(self):
+        return f"Discount {self.discount_percentage}% pentru {self.instrument.name}"
+
+
+# class CustomUser(AbstractUser):
+#     CNP = models.CharField(
+#         max_length=13,
+#         unique=True,
+#         validators=[
+#             RegexValidator(
+#                 regex='^[1-9]\d{12}$',
+#                 message='CNP-ul trebuie să conțină exact 13 cifre și să nu înceapă cu 0'
+#             )
+#         ]
+#     )
+#     telefon = models.CharField(
+#         max_length=10,
+#         validators=[
+#             RegexValidator(
+#                 regex='^07\d{8}$',
+#                 message='Numărul de telefon trebuie să înceapă cu 07 și să aibă 10 cifre'
+#             )
+#         ]
+#     )
+#     data_nasterii = models.DateField(
+#         validators=[
+#             MinValueValidator(limit_value=date(1900, 1, 1))
+#         ]
+#     )
+#     judet = models.CharField(max_length=50)
+#     ocupatie = models.CharField(max_length=100)
+
+#     class Meta:
+#         verbose_name = 'Utilizator'
+#         verbose_name_plural = 'Utilizatori'

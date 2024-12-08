@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Instrumente Muzicale</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/Filtrare.css' %}">
+</head>
+<body>
+    <h1>Instrumente Muzicale</h1>
+    
+    <!-- Filters -->
+    <div class="filters">
+        <form method="get">
+            <div class="filter-group">
+                <label>Model:</label>
+                <input type="text" name="model">
+            </div>
+            
+            <div class="filter-group">
+                <label>Preț minim:</label>
+                <input type="number" name="min_price">
+                
+                <label>Preț maxim:</label>
+                <input type="number" name="max_price">
+            </div>
+            
+            <div class="filter-group">
+                <label>Rating minim:</label>
+                <input type="number" step="0.1" min="0" max="5" name="min_rating">
+            </div>
+            
+            <div class="filter-group">
+                <label>Categorie:</label>
+                <select name="category">
+                    <option value="">Toate</option>
+                    {% for category in categories %}
+                        <option value="{{ category }}">
+                            {{ category }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Descriere:</label>
+                <input type="text" name="description"">
+            </div>
+            
+            <button type="submit">Aplică filtre</button>
+        </form>
+    </div>
+    
+    <!-- Instruments list -->
+    <div class="instruments-grid">
+        {% for instrument in instruments %}
+            <div class="instrument-card">
+                <h3>{{ instrument.model }}</h3>
+                <p>{{ instrument.description|truncatewords:20 }}</p>
+                <p>Preț: {{ instrument.price }} RON</p>
+                <p>Rating: {{ instrument.rating|default:"N/A" }}</p>
+                <p>Categorie: {{ instrument.category.instrument|default:"N/A" }}</p>
+            </div>
+        {% empty %}
+            <p>Nu s-au găsit instrumente care să corespundă criteriilor de filtrare.</p>
+        {% endfor %}
+    </div>
+    
+</body>
+</html>
