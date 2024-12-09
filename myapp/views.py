@@ -9,9 +9,19 @@ from django.db.models import Q
 def index(request):
     return HttpResponse("Hello, World!")    
 
-
 # Lab 5 task 1
 def FormFilerInstr(request):
+
+    """
+        Vine pe server o cerere GET sau POST
+        GET:
+            - se preiau toate instrumentele din baza de date si se afiseaza in pagina
+            - se afieaza formularul de filtrare gol
+        POST:
+            - se preiau toate instrumentele din baza de date
+            - se preiau toate valorile din formularul de filtrare
+            - se filtreaza instrumentele in functie de valorile din formular
+    """
     instruments = Instrument.objects.all()
 
     if request.method == 'GET':
@@ -40,10 +50,10 @@ def FormFilerInstr(request):
         if request.POST.get('description'):
             instruments = instruments.filter(description__icontains=request.POST.get('description'))
 
-    return JsonResponse({
-        'status': 'success',
-        'instruments': list(instruments.values())
-    }, safe=False)
+        return JsonResponse({
+            'status': 'success',
+            'instruments': list(instruments.values())
+        }, safe=False)
 
 # Lab 5 task 2
 def contact(request):

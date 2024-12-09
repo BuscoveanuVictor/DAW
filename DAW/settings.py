@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'debug_toolbar',
     'myapp',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -91,7 +92,13 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'profile'
+LOGOUT_REDIRECT_URL = 'login'
+
+SESSION_COOKIE_AGE = 86400 # sesiune de 24 ore in secunde
 
 
 # Password validation
