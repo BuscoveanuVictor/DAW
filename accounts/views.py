@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, CustomLoginForm
 
@@ -32,8 +32,35 @@ def login_view(request):
                 return redirect('profile')
     else:
         form = CustomLoginForm()
-    return render(request, 'registration/login.html', {'form': form})
+    return render(request, 'login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')  # înlocuiește cu pagina dorită după logout
 
 @login_required
 def profile_view(request):
-    return render(request, 'registration/profile.html', {'user': request.user})
+    return render(request, 'profile.html', {'user': request.user})
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .forms import CustomPasswordChangeForm
+
+@login_required
+def password_change(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)
+            messages.success(request, 'Parola a fost schimbată cu succes!')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Te rog corectează erorile de mai jos.')
+    else:
+        form = CustomPasswordChangeForm(user=request.user)
+    
+    return render(request, 'change_password.html', {'form': form})

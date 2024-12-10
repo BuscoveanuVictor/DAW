@@ -35,8 +35,39 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
-        
+    
+
 class CustomLoginForm(forms.Form):
-    username = forms.CharField(max_length=150)
-    password = forms.CharField(widget=forms.PasswordInput)
-    remember_me = forms.BooleanField(required=False, initial=False)
+    username = forms.CharField(
+        widget=forms.TextInput(
+            attrs={'class': 'form-control', 'placeholder': 'Nume utilizator'}
+        )
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': 'Parola'}
+        )
+    )
+    remember_me = forms.BooleanField(
+        required=False,
+        initial=False,
+        widget=forms.CheckboxInput()
+    )
+
+from django.contrib.auth.forms import PasswordChangeForm
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        field_settings = {
+            'old_password': 'Parola actuală',
+            'new_password1': 'Parola nouă',
+            'new_password2': 'Confirmă parola nouă'
+        }
+        
+        for field_name, placeholder in field_settings.items():
+            self.fields[field_name].widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': placeholder
+            })
