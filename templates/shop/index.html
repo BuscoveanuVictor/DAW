@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magazin de Instrumente</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .welcome-message {
+            margin: 30px 0;
+            color: #333;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .nav-button {
+            padding: 15px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="welcome-message">Bine ati venit la Magazinul nostru de Instrumente!</h1>
+        
+        <div class="button-container">
+            <a href="{% url 'instruments_list' %}" class="nav-button">
+                Lista Instrumente
+            </a>
+            <a href="{% url 'add_instrument' %}" class="nav-button">
+                Adauga Instrument Nou
+            </a>
+            <a href="{% url 'filter' %}" class="nav-button">
+                Filtrare Instrumente
+            </a>
+            <a href="{% url 'contact' %}" class="nav-button">
+                Contact
+            </a>
+        </div>
+    </div>
+</body>
+</html>

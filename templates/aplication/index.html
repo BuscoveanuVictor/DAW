@@ -1,0 +1,155 @@
+{% block content %}
+<div class="dashboard-container">
+    <div class="welcome-section">
+        <h1>Bun venit în Panoul de Control</h1>
+        <p>Selectează aplicația pe care dorești să o accesezi</p>
+    </div>
+
+    <div class="apps-grid">
+        <!-- Card pentru prima aplicație -->
+        <div class="app-card">
+            <div class="app-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3>Managementul conturilor</h3>
+            <p>Administrează conturile și rolurile utilizatorilor</p>
+            <a href="{% url 'accounts' %}" class="app-button">Accesează</a>
+        </div>
+
+        <!-- Card pentru a doua aplicație -->
+        <div class="app-card">
+            <div class="app-icon">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <h3>Gestiunea magazinului</h3>
+            <p>Gestionează produsele și comenzile</p>
+            <a href="{% url 'shop' %}" class="app-button">Accesează</a>
+        </div>
+
+        <!-- <div class="app-card">
+            <div class="app-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <h3>Rapoarte și Statistici</h3>
+            <p>Vizualizează statistici și generează rapoarte</p>
+           
+        </div>
+
+     
+        <div class="app-card">
+            <div class="app-icon">
+                <i class="fas fa-cog"></i>
+            </div>
+            <h3>Setări Sistem</h3>
+            <p>Configurează parametrii sistemului</p>
+           
+        </div> -->
+    </div>
+</div>
+
+<style>
+.dashboard-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.welcome-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-section h1 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 2.5rem;
+}
+
+.welcome-section p {
+    color: #34495e;
+    font-size: 1.2rem;
+}
+
+.apps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+}
+
+.app-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.app-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.app-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.app-icon i {
+    color: white;
+    font-size: 2rem;
+}
+
+.app-card h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.app-card p {
+    color: #666;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.app-button {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    transition: transform 0.2s ease;
+}
+
+.app-button:hover {
+    transform: scale(1.05);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .welcome-section h1 {
+        font-size: 2rem;
+    }
+
+    .welcome-section p {
+        font-size: 1rem;
+    }
+
+    .apps-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
