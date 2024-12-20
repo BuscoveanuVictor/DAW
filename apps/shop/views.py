@@ -5,6 +5,8 @@ from .models import Instrument, Category
 from .forms import ContactForm, InstrumentForm, filterForm
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.contrib.auth.models import User
+from django.db.models import Count
 
 def index(request):
     return render(request, 'shop/index.html')
@@ -49,14 +51,18 @@ def instruments_list(request):
 
 # Adaugare instrument nou folosind un formular
 def add_instrument(request):
+
+    if not request.user.has_perm('perm_add_instrument'):
+        print("N-ai voie!")
+        return render(request, 'aplication/handlers/403.html')
+    
     if request.method == 'GET':
         form = InstrumentForm()
-        return render(request, 'shop/add_instrument.html', {'form': form})
     if request.method == 'POST':
         form = InstrumentForm(request.POST)
         if form.is_valid():
             form.save()
-    #return render(request, 'shop/add_instrument.html', {'form': form})
+    return render(request, 'shop/add_instrument.html', {'form': form})
 
 
 
@@ -120,3 +126,85 @@ def contact(request):
     return render(request, 'shop/contact.html', {'form': form})
 
 
+
+
+from django.core.mail import send_mass_mail
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from .models import Vizualizare, Promotie
+from .forms import PromotieForm
+
+TEMPLATE_EMAILS = {
+    'chitara': {
+        'template': """
+        Salut {nume},
+        
+        Avem o ofertă specială pentru chitare: {discount}% reducere!
+        Folosește codul {cod} până la {data_expirare}.
+        
+        """,
+    },
+    'pian': {
+        'template': """
+        Dragă {nume},
+        
+        Nu rata oferta noastră pentru piane: {discount}% reducere!
+        Cod promoțional: {cod}
+        Valabil până la: {data_expirare}
+        
+        """,
+    }
+}
+
+
+#@login_required
+def adaugare_promotie(request):
+    if request.method == 'GET':
+        form = PromotieForm()
+    if request.method == 'POST':
+        form = PromotieForm(request.POST)
+        if form.is_valid():
+            form.save()
+            #trimitere_promotii()
+    return render(request, 'shop/adaugare_promotie.html', {'form': form})
+
+
+
+def trimitere_promotii():
+     
+    emails = []
+    K = 3  # Minim K vizualizări pentru a primi promoția
+    promotii = Promotie.objects.all()
+
+    for promotie in promotii:
+        if promotie.categorii not in TEMPLATE_EMAILS:
+            continue
+
+        else:       
+            for categorie in promotie.categorii:
+                # Găsim utilizatorii care au vizualizat categoria de K ori
+                utilizatori = User.objects.filter(
+                    vizualizare__produs__category=categorie #JOIN vizualizare cu produs si category
+                ).annotate(
+                    nr_vizualizari=Count('vizualizare')
+                ).filter(nr_vizualizari__gte=K).distinct()
+
+            template = TEMPLATE_EMAILS[categorie]['template']
+        
+            for user in utilizatori:
+                email_content = template.format(
+                    nume=user.username,
+                    discount=promotie.discount,
+                    cod=promotie.cod_promotional,
+                    data_expirare=promotie.data_expirare.strftime('%d/%m/%Y'),
+                )
+                
+                emails.append((
+                    email_content,
+                    'noreply@example.com',
+                    [user.email]
+                ))
+                
+    if len(emails) > 0:
+        send_mass_mail(emails, fail_silently=False)

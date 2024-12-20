@@ -1,9 +1,9 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, RegexValidator
 from datetime import date
-
+from apps.accounts.models import CustomUser
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Instrument(models.Model):
     instrument_id = models.AutoField(primary_key=True)
@@ -12,6 +12,11 @@ class Instrument(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, null=False)
     rating = models.FloatField(blank=True, null=True)
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='instruments', null=True)
+
+    class Meta:
+        permissions = [
+            ("perm_add_instrument", "Can add instrument"),
+        ]
 
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)
@@ -83,3 +88,31 @@ class Discount(models.Model):
 
     def __str__(self):
         return f"Discount {self.discount_percentage}% pentru {self.instrument.name}"
+
+import uuid
+class Vizualizare(models.Model):
+    utilizator = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    produs = models.ForeignKey('Instrument', on_delete=models.CASCADE)
+    data_vizualizare = models.DateTimeField(auto_now_add=True)
+    class Meta:
+       # trebuie ordonate ca sa stiu ce vizualizari sunt cele mai recente
+       ordering = ['-data_vizualizare'] 
+
+
+class Promotie(models.Model):
+    class Meta:
+       ordering = ['-data_creare']
+
+    nume = models.CharField(max_length=100)
+    data_creare = models.DateTimeField(auto_now_add=True)
+    data_expirare = models.DateTimeField()
+    discount = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
+    cod_promotional = models.CharField(max_length=16, unique=True,blank=True)
+    categorii = models.JSONField() 
+   
+    def save(self, *args, **kwargs):
+       if not self.cod_promotional:
+           self.cod_promotional = str(uuid.uuid4())[:16]
+       super().save(*args, **kwargs)

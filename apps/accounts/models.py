@@ -4,6 +4,10 @@ from django.core.validators import MinValueValidator, RegexValidator, EmailValid
 import uuid
 
 class CustomUser(AbstractUser):
+      
+    def generate_confirmation_code(self):
+        return str(uuid.uuid4())[:16]
+
     # Implicit clasa User are urm atribute(laboratorul6):
     # username, first_name, last_name, email, password
     # s_staff: indică dacă utilizatorul poate accesa interfața de administrare.
@@ -23,12 +27,11 @@ class CustomUser(AbstractUser):
             )
         ],
         help_text="Numarul de telefon trebuie sa fie in format: '07x xxx xxx'",
-        null=True,
+      
     )
     adresa = models.TextField(max_length=255)
     data_nasterii = models.DateField(
-        help_text="Data nasterii trebuie sa fie in formatul an.luna.zi",
-        null=True,
+        help_text="Data nasterii trebuie sa fie in formatul an.luna.zi", 
     )
     profesie = models.CharField(max_length=100)
     experienta = models.IntegerField(
@@ -36,10 +39,11 @@ class CustomUser(AbstractUser):
             MinValueValidator(0)
         ],
         help_text="Experienta este exprimata in ani si trebuie sa fie un numar intreg pozitiv",
-        null=True,
     )
-    cod = models.CharField(max_length=100, null=True, blank=True)
-    email_confirmat = models.BooleanField(default=False, null=True)
+    # blank=True permite ca acest camp sa fie lasat gol 
+    # in cazul in care un formular este completat(poate fara a fi salvat)
+    # null=True permite ca acest camp sa fie lasat gol in baza de date
+    cod = models.CharField(max_length=100,null=True, blank=True)
+    email_confirmat = models.BooleanField(default=False, null=True, blank=True)
 
-    def generate_confirmation_code(self):
-        return str(uuid.uuid4())[:16]
+

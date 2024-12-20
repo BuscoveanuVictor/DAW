@@ -1,0 +1,59 @@
+
+{% block content %}
+<div class="container mt-4">
+   <h2>Adaugă o nouă promoție</h2>
+   
+   <form method="POST" class="mt-4">
+       {% csrf_token %}
+       
+       <div class="form-group">
+           {{ form.as_p }}
+       </div>
+        <button type="submit" class="btn btn-primary mt-3">Salvează promoția</button>
+   </form>
+    {% if messages %}
+   <div class="mt-3">
+       {% for message in messages %}
+           <div class="alert alert-{{ message.tags }}">
+               {{ message }}
+           </div>
+       {% endfor %}
+   </div>
+   {% endif %}
+</div>
+<style>
+   form {
+       max-width: 600px;
+   }
+   
+   .form-group label {
+       font-weight: bold;
+       margin-bottom: 0.5rem;
+       display: block;
+   }
+   
+   .form-group input, .form-group select {
+       width: 100%;
+       padding: 0.5rem;
+       margin-bottom: 1rem;
+       border: 1px solid #ddd;
+       border-radius: 4px;
+   }
+   
+   .form-group textarea {
+       width: 100%;
+       padding: 0.5rem;
+       margin-bottom: 1rem;
+       border: 1px solid #ddd;
+       border-radius: 4px;
+       min-height: 100px;
+   }
+   
+   .errorlist {
+       color: red;
+       list-style: none;
+       padding: 0;
+       margin: 0 0 1rem 0;
+   }
+</style>
+{% endblock %}

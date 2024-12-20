@@ -1,7 +1,8 @@
 from django import forms
-from .models import Instrument
+from .models import Instrument, Promotie
 import re
 import datetime
+from django.utils import timezone
 
 # Lab 5 task 1
 # Formularul de filtrare
@@ -177,3 +178,44 @@ class InstrumentForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+    
+#------------------------------------------------------------------------
+
+class PromotieForm(forms.ModelForm):
+    class Meta:
+        model = Promotie
+        fields = ['nume','data_expirare', 'discount', 'categorii']
+
+    data_expirare = forms.DateTimeField(
+        label='Data expirarii',
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        error_messages={'invalid': 'Introduceti o data valida'}
+    )
+    discount = forms.IntegerField(label='Discount (%)')
+    categorii = forms.MultipleChoiceField(
+        choices=[
+            ('chitara', 'Chitara'),
+            ('pian', 'Pian'),
+            ('tobe', 'Tobe')
+        ],
+        widget=forms.CheckboxSelectMultiple,
+        initial=['chitara']
+    )
+    def clean_discount(self):
+        discount = self.cleaned_data.get('discount')
+        if discount < 0 or discount > 100:
+            raise forms.ValidationError('Discountul trebuie sa fie intre 0 si 100%')
+        return discount
+
+    def clean_data_expirare(self):
+        data = self.cleaned_data['data_expirare']
+        if data <= timezone.now():
+            raise forms.ValidationError('Data expirarii trebuie sa fie in viitor')
+        return data
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+        return instance
+
