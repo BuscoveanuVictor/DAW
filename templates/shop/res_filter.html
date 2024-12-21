@@ -1,0 +1,21 @@
+<div class="row"></div>
+    {% for instrument in instruments %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ instrument.model }}</h5>
+                <p class="card-text">
+                    <strong>Categorie:</strong> {{ instrument.category }}<br>
+                    <strong>Preț:</strong> {{ instrument.price }} RON<br>
+                    <strong>Rating:</strong> {{ instrument.rating }}<br>
+                    <strong>Descriere:</strong> {{ instrument.description }}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <p class="text-center">Nu s-au găsit instrumente care să corespundă criteriilor de filtrare.</p>
+    </div>
+    {% endfor %}
+</div>
